@@ -7,6 +7,7 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import tags.Tags;
@@ -29,11 +30,9 @@ public class MainGui {
 	private JButton btnChat, btnExit;
 	private JLabel lblLogo;
 	private JLabel lblActiveNow;
-	private static JList<String> listActive;
-	
+	private static JList<String> listActive;	
 	static DefaultListModel<String> model = new DefaultListModel<>();
 	private JLabel lblUsername;
-
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -82,20 +81,14 @@ public class MainGui {
 	
 	private void initialize() {
 		frameMainGui = new JFrame();
-		frameMainGui.setTitle("Menu Chat");
+		frameMainGui.setTitle("View");
 		frameMainGui.setResizable(false);
 		frameMainGui.setBounds(100, 100, 500, 560);
 		frameMainGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frameMainGui.getContentPane().setLayout(null);
 
-		// Welcome 
-		JLabel lblHello = new JLabel("Welcome");
-		lblHello.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		lblHello.setBounds(12, 82, 70, 16);
-		frameMainGui.getContentPane().add(lblHello);
-
 		// Name Friend
-		JLabel lblFriendsName = new JLabel("Name Friend: ");
+		JLabel lblFriendsName = new JLabel("Friend: ");
 		lblFriendsName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		lblFriendsName.setBounds(12, 425, 110, 16);
 		frameMainGui.getContentPane().add(lblFriendsName);
@@ -106,9 +99,10 @@ public class MainGui {
 		txtNameFriend.setBounds(100, 419, 384, 28);
 		frameMainGui.getContentPane().add(txtNameFriend);
 
-		btnChat = new JButton("Chat");
+		btnChat = new JButton("");
 		btnChat.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-
+		btnChat.setFocusPainted(false);
+		btnChat.setContentAreaFilled(false);
 		btnChat.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -135,10 +129,12 @@ public class MainGui {
 				Tags.show(frameMainGui, "Friend is not found. Please wait to update your list friend", false);
 			}
 		});
-		btnChat.setBounds(20, 465, 129, 44);
+		btnChat.setBounds(10, 465, 129, 44);
 		frameMainGui.getContentPane().add(btnChat);
-		btnChat.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/chat.png")));
-		btnExit = new JButton("Exit");
+		btnChat.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/chat1.png")));
+		btnExit = new JButton("");
+		btnExit.setFocusPainted(false);
+		btnExit.setContentAreaFilled(false);
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -154,20 +150,20 @@ public class MainGui {
 			}
 		});
 		btnExit.setBounds(353, 465, 129, 44);
-		btnExit.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/stop.png")));
+		btnExit.setIcon(new ImageIcon(MainGui.class.getResource("/image/exit.png")));
 		frameMainGui.getContentPane().add(btnExit);
 		
-		lblLogo = new JLabel("CONNECT WITH EVERYONE IN THE WORLD");
+		lblLogo = new JLabel("SECRET CHAT APP");
 		lblLogo.setForeground(new Color(0, 0, 205));
-		lblLogo.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/connect.png")));
-		lblLogo.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblLogo.setBounds(51, 13, 413, 38);
+		lblLogo.setIcon(new ImageIcon(MainGui.class.getResource("/image/logo.png")));
+		lblLogo.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblLogo.setBounds(10, 13, 413, 38);
 		frameMainGui.getContentPane().add(lblLogo);
 		
-		lblActiveNow = new JLabel("List Account Active Now");
+		lblActiveNow = new JLabel("Users Online");
 		lblActiveNow.setForeground(new Color(100, 149, 237));
 		lblActiveNow.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblActiveNow.setBounds(10, 123, 156, 16);
+		lblActiveNow.setBounds(10, 70, 156, 16);
 		frameMainGui.getContentPane().add(lblActiveNow);
 		
 		listActive = new JList<>(model);
@@ -179,7 +175,7 @@ public class MainGui {
 				txtNameFriend.setText(value);
 			}
 		});
-		listActive.setBounds(12, 152, 472, 251);
+		listActive.setBounds(12, 100, 472, 290);
 		frameMainGui.getContentPane().add(listActive);
 		
 		lblUsername = new JLabel(username);
@@ -187,11 +183,9 @@ public class MainGui {
 		lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		lblUsername.setBounds(75, 76, 156, 28);
 		frameMainGui.getContentPane().add(lblUsername);
-	
-			
+
 	}
 		
-
 	public static int request(String msg, boolean type) {
 		JFrame frameMessage = new JFrame();
 		return Tags.show(frameMessage, msg, type);

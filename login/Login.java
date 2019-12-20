@@ -1,5 +1,6 @@
 package login;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -57,57 +58,44 @@ public class Login {
   frameLoginForm = new JFrame();
   frameLoginForm.setTitle("Login Form");
   frameLoginForm.setResizable(false);
-  frameLoginForm.setBounds(100, 100, 517, 343);
+  frameLoginForm.setBounds(100, 100, 450, 400);
   frameLoginForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   frameLoginForm.getContentPane().setLayout(null);
 
-  // Label Connect With Server
-  JLabel lblWelcome = new JLabel("Connect With Server\r\n");
+  JLabel lblWelcome = new JLabel("LOGIN");
   lblWelcome.setForeground(UIManager.getColor("RadioButtonMenuItem.selectionBackground"));
-  lblWelcome.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-  lblWelcome.setBounds(27, 13, 312, 48);
+  lblWelcome.setFont(new Font("Segoe UI", Font.PLAIN, 40));
+  lblWelcome.setBounds(180, 30, 450, 50);
   frameLoginForm.getContentPane().add(lblWelcome);
 
-  // Nhập địa chỉ của Server 
   JLabel lblHostServer = new JLabel("IP Server");
   lblHostServer.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-  lblHostServer.setBounds(47, 74, 86, 20);
+  lblHostServer.setBounds(30, 124, 86, 20);
   frameLoginForm.getContentPane().add(lblHostServer);
 
-  txtIP = new JTextField();
-  txtIP.setBounds(128, 70, 185, 28);
-  frameLoginForm.getContentPane().add(txtIP);
-  txtIP.setColumns(10); 
-  
-  // Port của Server, mặc định là 8080
-  JLabel lblPortServer = new JLabel("Port Server");
-  lblPortServer.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-  lblPortServer.setBounds(349, 77, 79, 14);
-  frameLoginForm.getContentPane().add(lblPortServer);
 
-  txtPort = new JTextField();
-  txtPort.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-  txtPort.setText("8080");
-  txtPort.setEditable(false);
-  txtPort.setColumns(10);
-  txtPort.setBounds(429, 70, 65, 28);
-  frameLoginForm.getContentPane().add(txtPort);
+  JLabel lblUserName = new JLabel("Username");
+  lblUserName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+  lblUserName.setBounds(30, 184, 150, 38);
+  frameLoginForm.getContentPane().add(lblUserName);
 
-  
-  lblError = new JLabel("ololololo");
-  lblError.setBounds(66, 287, 399, 20);
+  lblError = new JLabel("");
+  lblError.setBounds(55, 325, 400, 20);
   frameLoginForm.getContentPane().add(lblError);
 
-  // Nhập username 
+  txtIP = new JTextField();
+  txtIP.setBounds(128, 120, 270, 28);
+  frameLoginForm.getContentPane().add(txtIP);
+  txtIP.setColumns(10);
+
   txtUsername = new JTextField();
   txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 13));
   txtUsername.setColumns(10);
-  txtUsername.setBounds(128, 138, 366, 30);
+  txtUsername.setBounds(128, 188, 270, 30);
   frameLoginForm.getContentPane().add(txtUsername);
 
-  btnLogin = new JButton("Login");
+  btnLogin = new JButton("LOGIN");
   btnLogin.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-  btnLogin.setIcon(new javax.swing.ImageIcon(Login.class.getResource("/image/login.png")));
   btnLogin.addActionListener(new ActionListener() {
 
    public void actionPerformed(ActionEvent arg0) {
@@ -120,45 +108,37 @@ public class Login {
     if (checkName.matcher(name).matches() && !IP.equals("")) {
      try {
       Random rd = new Random();
-      // tạo cổng ngẫu nhiên cho client, cổng > 10000
       int portPeer = 10000 + rd.nextInt() % 1000;
-      // trả về đối tượng InetAddress với địa chỉ IP thô
       InetAddress ipServer = InetAddress.getByName(IP);
-      System.out.println("ip server" + ipServer);
       int portServer = Integer.parseInt("8080");
-      // Tạo socket cho client 
       Socket socketClient = new Socket(ipServer, portServer);
 
       String msg = Encode.getCreateAccount(name, Integer.toString(portPeer));
-      System.out.println("encode" + msg);
-      // Ghi dữ liệu nguyên thủy của một đối tượng vào một OutputStream
       ObjectOutputStream serverOutputStream = new ObjectOutputStream(socketClient.getOutputStream());
-      // Ghi một đối tượng chỉ định tới objectOutputStream
       serverOutputStream.writeObject(msg);
-      // Làm sạch objectInputStream
       serverOutputStream.flush();
-      // Nhận dữ liệu từ server 
       ObjectInputStream serverInputStream = new ObjectInputStream(socketClient.getInputStream());
-      // Nhận tag từ server
       msg = (String) serverInputStream.readObject();
-      System.out.println("msg" + msg);
+
       socketClient.close();
       if (msg.equals(Tags.SESSION_DENY_TAG)) {
+       lblError.setForeground(new Color(220,20,60));
        lblError.setText(NAME_EXSIST);
        lblError.setVisible(true);
        return;
       }
-      // Khởi tạo trang MainGui 
       new MainGui(IP, portPeer, name, msg);
       //						new menuGUI(IP, portPeer, "toan", msg);
       frameLoginForm.dispose();
      } catch (Exception e) {
+      lblError.setForeground(new Color(220,20,60));
       lblError.setText(SERVER_NOT_START);
       lblError.setVisible(true);
       e.printStackTrace();
      }
     }
     else {
+     lblError.setForeground(new Color(220,20,60));
      lblError.setText(NAME_FAILED);
      lblError.setVisible(true);
      lblError.setText(NAME_FAILED);
@@ -166,9 +146,10 @@ public class Login {
    }
   });
   
-  btnLogin.setBounds(325, 217, 169, 63);
+  btnLogin.setBounds(270, 255, 127, 40);
   frameLoginForm.getContentPane().add(btnLogin);
   lblError.setVisible(false);
+
 
  }
 }

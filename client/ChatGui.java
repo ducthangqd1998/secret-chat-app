@@ -3,6 +3,7 @@ package client;
 import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -497,7 +498,11 @@ public class ChatGui {
 			}
 		});
 
-		btnDisConnect = new JButton("LEAVE CHAT");
+		btnDisConnect = new JButton("");
+		btnDisConnect.setIcon(new ImageIcon(MainGui.class.getResource("/image/leave.png")));
+		btnDisConnect.setBorderPainted(false);
+		btnDisConnect.setFocusPainted(false);
+		btnDisConnect.setContentAreaFilled(false);
 		btnDisConnect.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnDisConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
