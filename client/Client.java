@@ -15,6 +15,7 @@ import tags.Encode;
 import tags.Tags;
 
 public class Client {
+	
 	public static ArrayList<Peer> clientarray = null;
 	private ClientServer server;
 	private InetAddress IPserver;
@@ -111,7 +112,6 @@ public class Client {
 		System.out.println("guest" + guest + " " + connclient);
 		new ChatGui(username, guest, connclient, portClient);
 		
-
 	}
 
 	public void exit() throws IOException, ClassNotFoundException {

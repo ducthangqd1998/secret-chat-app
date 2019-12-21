@@ -1,48 +1,25 @@
 package client;
 
 import java.awt.EventQueue;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JEditorPane;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.Label;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JPanel;
+import java.util.*;
+import java.util.List;
 
 import data.DataFile;
 import tags.Decode;
 import tags.Encode;
 import tags.Tags;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.Color;
-import javax.swing.JTextPane;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.border.EmptyBorder;
+import java.awt.*;
+
 
 
 public class ChatGui {
@@ -61,18 +38,22 @@ public class ChatGui {
 	private Label textState, lblReceive;
 	private JButton btnDisConnect, btnSend, btnChoose;
 	public boolean isStop = false, isSendFile = false, isReceiveFile = false;
-	String pathImage = "";
+	private String pathImage = "";
 	private JProgressBar progressSendFile;
 	private JTextField txtPath;
 	private int portServer = 0;
+	private JDialog dialogIcon;
 	private JTextField txtMessage;
 	private JScrollPane scrollPane;
-	private JButton btnSmileBigIcon;
-	private JButton btnCryingIcon;
-	private JButton btnSmileCryingIcon;
-	private JButton btnHeartEyeIcon;
-	private JButton buttonScaredIcon;
-	private JButton buttonSadIcon;
+	String pathIcon;
+	List<JButton> Emotions = new ArrayList<JButton>();
+	JButton button;
+	List<String> iconPath = new ArrayList<String>();
+	String s = "";
+	JScrollPane scrollPanel;
+	JPanel panel;
+	File folder = null;
+
 
 	public ChatGui(String user, String guest, Socket socket, int port) {
 		username = user;
@@ -89,6 +70,14 @@ public class ChatGui {
 				}
 			}
 		});
+	}
+	
+	public void setPathIcon(String pathIcon) {
+		this.pathIcon = pathIcon;
+	}
+	
+	public String getPathIcon() {
+		return this.pathIcon;
 	}
 
 	public static void main(String[] args) {
@@ -107,6 +96,8 @@ public class ChatGui {
 	public void updateChat_receive(String msg) {
 		appendToPane(txtDisplayChat, "<div class='left' style='width: 40%; background-color: #f1f0f0;'>"+ msg +"</div>");
 	}
+	
+	
 
 	public void updateChat_send(String msg) {
 		appendToPane(txtDisplayChat, "<table class='bang' style='color: white; clear:both; width: 100%;'>"
@@ -276,188 +267,77 @@ public class ChatGui {
 
 		panelMessage.add(btnSendLike);
 		
-		JButton btnSmileIcon = new JButton("");
-		btnSmileIcon.addActionListener(new ActionListener() {
+		JButton btnIcon = new JButton("");
+		btnIcon.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/smile.png") +"'></img>";
-				System.out.println("Tin nhan truoc khi bi encode: " +  msg);
-				System.out.println("Tin nhan sau khi bi encode: " +  Encode.sendMessage(msg));
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}
-		});
-		btnSmileIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		btnSmileIcon.setContentAreaFilled(false);
-		btnSmileIcon.setBounds(62, 96, 50, 36);
-		btnSmileIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/smile.png")));
-		panelMessage.add(btnSmileIcon);
-		
-		Label label_1 = new Label("Icon");
-		label_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		label_1.setBounds(10, 107, 39, 22);
-		panelMessage.add(label_1);
-		
-		btnSmileBigIcon = new JButton("");
-		btnSmileBigIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		btnSmileBigIcon.setContentAreaFilled(false);
-		btnSmileBigIcon.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/smile_big.png") +"'></img>";
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}		});
-		btnSmileBigIcon.setBounds(124, 96, 50, 36);
-		panelMessage.add(btnSmileBigIcon);
-		btnSmileBigIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/smile_big.png")));
-		
-		btnCryingIcon = new JButton("");
-		btnCryingIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		btnCryingIcon.setContentAreaFilled(false);
-		btnCryingIcon.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/crying.png") +"'></img>";
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}
-		});
-		btnCryingIcon.setBounds(186, 96, 65, 36);
-		panelMessage.add(btnCryingIcon);
-		btnCryingIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/crying.png")));
-		
-		btnSmileCryingIcon = new JButton("");
-		btnSmileCryingIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		btnSmileCryingIcon.setContentAreaFilled(false);
-		btnSmileCryingIcon.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/smile_cry.png") +"'></img>";
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}
-		});
-		btnSmileCryingIcon.setBounds(255, 96, 56, 39);
-		panelMessage.add(btnSmileCryingIcon);
-		btnSmileCryingIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/smile_cry.png")));
-		
-		btnHeartEyeIcon = new JButton("");
-		btnHeartEyeIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		btnHeartEyeIcon.setContentAreaFilled(false);
-		btnHeartEyeIcon.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/heart_eye.png") +"'></img>";
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}
-		});
-		btnHeartEyeIcon.setBounds(323, 96, 75, 36);
-		panelMessage.add(btnHeartEyeIcon);
-		btnHeartEyeIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/heart_eye.png")));
-		
-		buttonScaredIcon = new JButton("");
-		buttonScaredIcon.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/scared.png") +"'></img>";
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}
-		});
-		buttonScaredIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/scared.png")));
-		buttonScaredIcon.setContentAreaFilled(false);
-		buttonScaredIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		buttonScaredIcon.setBounds(394, 96, 75, 36);
-		panelMessage.add(buttonScaredIcon);
-		
-		buttonSadIcon = new JButton("");
-		buttonSadIcon.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String msg = "<img src='" + ChatGui.class.getResource("/image/sad.png") +"'></img>";
-				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				updateChat_send_Symbol(msg);
-			}
-		});
-		buttonSadIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/sad.png")));
-		buttonSadIcon.setContentAreaFilled(false);
-		buttonSadIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
-		buttonSadIcon.setBounds(476, 96, 75, 36);
-		panelMessage.add(buttonSadIcon);
-		
-		//action when press button Send
-		btnSend.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (isSendFile)
-					try {
-						chat.sendMessage(Encode.sendFile(nameFile));
-					} catch (Exception e) {
-						System.out.println("Error send file: " + e);
-					}
+				dialogIcon = new JDialog(frameChatGui, "Icon");
 				
-				if (isSendImage) {
-					System.out.println("nameFile" + pathImage);
-					pathImage = "file:/" + pathImage;
-					String msg = "<img src='" + pathImage +"'></img>"; 
-					System.out.println("msg image" + msg);
-					try {
-						chat.sendMessage(Encode.sendMessage(msg));
-					}catch (Exception e) {
-						System.out.println("Error send image: " + e);
-					}
-					updateChat_send_Symbol(msg);
-				}
-
-				if (isStop) {
-					updateChat_send(txtMessage.getText().toString());
-					txtMessage.setText(""); //reset text Send
-					return;
-				}
-				System.out.println("okokokokokoko");
-				String msg = txtMessage.getText();
-				if (msg.equals(""))
-					return;
 				try {
-					chat.sendMessage(Encode.sendMessage(msg));
-					updateChat_send(msg);
-					System.out.println("send send send send");
-					txtMessage.setText("");
-				} catch (Exception e) {
-					e.printStackTrace();
+					s = Icon.class.getResource("/image/icon/").toString().split(":", 2)[1];
+					folder = new File(s);
+				}catch(Exception e) {}
+				System.out.println(s);
+				File[] listOfFiles = folder.listFiles();
+				int i = 0; 
+				for (File file : listOfFiles) {
+				    if (file.isFile()) {
+				        button = new JButton();
+				        button.setBorder(new EmptyBorder(0, 0, 0, 0));
+				        button.setContentAreaFilled(false);
+				        button.setIcon(new ImageIcon(s + file.getName()));
+				        button.setBackground(Color.WHITE);
+				        iconPath.add(s + file.getName());
+				        button.addActionListener( new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								System.out.println(ChatGui.class.getResource("/image/like.png"));
+								String msg = "<img src='" + "file:" + s + file.getName() + "'></img>";
+								System.out.println(msg);
+								try {
+									chat.sendMessage(Encode.sendMessage(msg));
+								} catch (Exception e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								updateChat_send_Symbol(msg);
+							}
+						});
+				        Emotions.add(button);
+				        i++;
+				    }
 				}
+				
+				panel = new JPanel(new GridLayout(8, 4, 0, 10));
+				
+				for (i = 0; i < Emotions.size(); i++) {
+				    panel.add(Emotions.get(i));
+				}
+				panel.setBackground(Color.WHITE);
+				scrollPanel = new JScrollPane();
+				scrollPanel.setViewportView(panel);
+				scrollPanel.setForeground(Color.WHITE);
+				dialogIcon.add(scrollPanel);
+				dialogIcon.setSize(250, 250);
+				dialogIcon.setVisible(true);
+//				new Icon("Icon");
+//				System.out.println(getPathIcon());
+//				String msg = "<img src='" + ChatGui.class.getResource("/image/smile.png") +"'></img>";
+//				System.out.println("Tin nhan truoc khi bi encode: " +  msg);
+//				System.out.println("Tin nhan sau khi bi encode: " +  Encode.sendMessage(msg));
+//				try {
+//					chat.sendMessage(Encode.sendMessage(msg));
+//				} catch (Exception e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//				updateChat_send_Symbol(msg);
 			}
 		});
-
+		btnIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
+		btnIcon.setContentAreaFilled(false);
+		btnIcon.setBounds(62, 96, 50, 36);
+		btnIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/smile.png")));
+		panelMessage.add(btnIcon);
 		
 		txtMessage.addKeyListener(new KeyListener() {
 

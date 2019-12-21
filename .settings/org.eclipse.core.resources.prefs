@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//client/ChatGui.java=UTF-8
 encoding//client/Client.java=UTF-8
+encoding//client/Cryption.java=UTF-8
 encoding//client/MainGui.java=UTF-8
 encoding//login/Login.java=UTF-8
 encoding//server/ServerCore.java=UTF-8
