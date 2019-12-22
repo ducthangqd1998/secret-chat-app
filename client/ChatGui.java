@@ -199,7 +199,37 @@ public class ChatGui {
 		btnSend.setBorder(new EmptyBorder(0, 0, 0, 0));
 		btnSend.setContentAreaFilled(false);
 		panelMessage.add(btnSend);
-		btnSend.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/send.png")));
+		btnSend.setIcon(new ImageIcon(ChatGui.class.getResource("/image/send.png")));
+		
+		btnSend.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				if (isSendFile)
+					try {
+						chat.sendMessage(Encode.sendFile(nameFile));
+//						chat.sendFile(nameFile);
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				if (isStop) {
+					updateChat_send(txtMessage.getText().toString());
+					txtMessage.setText(""); //reset text Send
+					return;
+				}
+				String msg = txtMessage.getText();
+				if (msg.equals(""))
+					return;
+				try {
+					chat.sendMessage(Encode.sendMessage(msg));
+					updateChat_send(msg);
+					txtMessage.setText("");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		
 		// Button send file for guest 
 		btnChoose = new JButton("");
@@ -466,7 +496,6 @@ public class ChatGui {
 			// user socket 
 			connect = connection;
 			PublicKey = key;
-			System.out.println("KeYYYYYYYYYYYYYYY" + mykey);
 			myKey = mykey;
 			nameGuest = guest;
 		}
@@ -482,6 +511,17 @@ public class ChatGui {
 					System.out.println("objobj " + obj);
 					if (obj instanceof String) {
 						String msgObj = obj.toString();
+						byte message[] = null;
+						try {
+							System.out.println("okokoko" + myKey.getPrivateKey());
+							Cipher c = Cipher.getInstance("RSA");
+							c.init(Cipher.DECRYPT_MODE, myKey.getPrivateKey());
+							message = c.doFinal(Base64.getDecoder().decode(msgObj));
+							System.out.println("Dữ liệu sau khi giải mã: " + new String(message));
+						}catch(Exception e) {
+							System.out.println("Error for decode string: " + e);
+						}
+						msgObj = new String(message);
 						System.out.println("============" + msgObj + "============");
 						// User bên kia có ý định dừng chat
 						if (msgObj.equals(Tags.CHAT_CLOSE_TAG)) {
@@ -571,23 +611,7 @@ public class ChatGui {
 //							finishReceive = true;
 						} else {
 							System.out.println(7);
-							byte message[] = null;
-							System.out.println("decryption");
-							System.out.println("okokoko1" + myKey);
-							System.out.println("okokoko" + myKey.getPrivateKey());
-							try {
-								System.out.println("okokoko" + myKey.getPrivateKey());
-								Cipher c = Cipher.getInstance("RSA");
-								c.init(Cipher.DECRYPT_MODE, myKey.getPrivateKey());
-								message = c.doFinal(Base64.getDecoder().decode(msgObj));
-								System.out.println("Dữ liệu sau khi giải mã: " + new String(message));
-							}catch(Exception e) {
-								System.out.println("Error for decode string: " + e);
-							}
-							System.out.println("okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk" + message);
-							System.out.println("raw text: " + msgObj);
-//							String message = Decode.getMessage(msgObj);
-							updateChat_receive( new String(message));
+							updateChat_receive( new String(msgObj));
 						}
 					} else if (obj instanceof DataFile) {
 						DataFile data = (DataFile) obj;
@@ -652,12 +676,14 @@ public class ChatGui {
 			do {
 //				System.out.println("sizeOfSend : " + sizeOfSend);
 				if (continueSendFile) {
+					System.out.println("continueSendFile" + continueSendFile);
 					continueSendFile = false;
-//					updateChat_notify("If duoc thuc thi: " + String.valueOf(continueSendFile));
+//					updateChat_notify("Neu duoc thuc thi: " + String.valueOf(continueSendFile));
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
 							try {
+								System.out.println("Send file .......................");
 								inFileSend.read(dataFile.data);
 								sendMessage(dataFile);
 								sizeOfSend++;
@@ -742,6 +768,7 @@ public class ChatGui {
 			} 
 			// send attach file
 			else if (obj instanceof DataFile) {
+				System.out.println("Send file");
 				outPeer.writeObject(obj);
 				outPeer.flush();
 			}
