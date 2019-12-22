@@ -7,9 +7,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import data.Peer;
+import sun.security.util.Length;
 import tags.Decode;
 import tags.Encode;
 import tags.Tags;
@@ -18,21 +23,25 @@ public class Client {
 	
 	public static ArrayList<Peer> clientarray = null;
 	private ClientServer server;
+	private static Cryption key;
 	private InetAddress IPserver;
 	private int portServer = 8080;
 	private String username = "";
 	private boolean isStop = false;
-	private static int portClient = 10000; 
+	private static int portClient = 10000;
+	private static PublicKey myPublicKey = null;
 	private int timeOut = 10000;  //time to each request is 10 seconds.
 	private Socket socketClient;
 	private ObjectInputStream serverInputStream;
 	private ObjectOutputStream serverOutputStream;
 
-	public Client(String arg, int arg1, String name, String dataUser) throws Exception {
+	public Client(String arg, int arg1, String name, String dataUser, Cryption key) throws Exception {
 		IPserver = InetAddress.getByName(arg); // arg là IP address của server 
 		username = name; // username của user
-		portClient = arg1; // port của clieny 
+		portClient = arg1; // port của client 
 		clientarray = Decode.getAllUser(dataUser); // get các user đang online
+		this.key = key;
+		this.myPublicKey = key.getPublicKey();
 		// Có hai cách để tạo thread trong java
 		// + implements runnable interfaces trong java: Ta cần override run method, tạo object Thread với params
 		//   là 1 new Runnable và gọi start method
@@ -53,6 +62,14 @@ public class Client {
 	public static int getPort() {
 		return portClient;
 	}
+	
+	public static PublicKey getPublicKey() {
+		return myPublicKey;
+	}
+	
+	public static Cryption getCryption() {
+		return key;
+	}
 
 	public void request() throws Exception {
 		// Tạo 1 socket 
@@ -67,9 +84,10 @@ public class Client {
 		serverOutputStream.flush();
 		serverInputStream = new ObjectInputStream(socketClient.getInputStream());
 		msg = (String) serverInputStream.readObject();
+//		System.out.println(msg);
 		serverInputStream.close();
 		//		just for test
-		System.out.println("toantoan" + msg); //test server return to user
+//		System.out.println("toantoan" + msg); //test server return to user
 		clientarray = Decode.getAllUser(msg);
 		new Thread(new Runnable() {
 
@@ -99,7 +117,8 @@ public class Client {
 	public void intialNewChat(String IP, int host, String guest) throws Exception {
 		final Socket connclient = new Socket(InetAddress.getByName(IP), host);
 		ObjectOutputStream sendrequestChat = new ObjectOutputStream(connclient.getOutputStream());
-		sendrequestChat.writeObject(Encode.sendRequestChat(username));
+		String key = Base64.getEncoder().encodeToString(this.key.getPublicKey().getEncoded());
+		sendrequestChat.writeObject(Encode.sendRequestChat(username, key));
 		sendrequestChat.flush();
 		ObjectInputStream receivedChat = new ObjectInputStream(connclient.getInputStream());
 		String msg = (String) receivedChat.readObject();
@@ -108,9 +127,19 @@ public class Client {
 			connclient.close();
 			return;
 		}
-		//not if
-		System.out.println("guest" + guest + " " + connclient);
-		new ChatGui(username, guest, connclient, portClient);
+		String pubkey = msg.substring(14, msg.length() - 0);
+		byte[] z = Base64.getDecoder().decode(pubkey);
+		try {
+//			System.out.println(z);
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(z);
+			KeyFactory factory = KeyFactory.getInstance("RSA");
+			PublicKey pubKey = factory.generatePublic(spec);
+//			System.out.println("guest" + guest + " " + connclient);
+			new ChatGui(username, guest, connclient, portClient, pubKey, this.key);
+		}catch(Exception e) {
+			System.out.println("Error for create chatroom");
+		}
+		
 		
 	}
 

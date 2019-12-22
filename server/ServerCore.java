@@ -4,7 +4,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import data.Peer;
 import tags.Decode;
@@ -42,7 +46,10 @@ public class ServerCore {
 			msg += Tags.PORT_OPEN_TAG;
 			msg += peer.getPort();
 			msg += Tags.PORT_CLOSE_TAG;
-			msg += Tags.PEER_CLOSE_TAG;			
+			msg += Tags.PUBLIC_KEY_OPEN_TAG;
+			msg += peer.getPublicKey();
+			msg += Tags.PUBLIC_KEY_CLOSE_TAG;
+			msg += Tags.PEER_CLOSE_TAG;	
 		}
 		msg += Tags.SESSION_ACCEPT_CLOSE_TAG;	
 		return msg;
@@ -58,15 +65,25 @@ public class ServerCore {
 	//client connect to server
 	private boolean waitForConnection() throws Exception {
 		connection = server.accept();			
+//		System.out.println("okokokokoko");
 		obInputStream = new ObjectInputStream(connection.getInputStream());		
-		String msg = (String) obInputStream.readObject();			
+		String msg = (String) obInputStream.readObject();	
 		// Trả về mảng bao gồm userName và port
+//		System.out.println(msg);
 		ArrayList<String> getData = Decode.getUser(msg);		
 		ServerGui.updateMessage(msg);											
 		if (getData != null) {
-			if (!isExsistName(getData.get(0))) {						
+			if (!isExsistName(getData.get(0))) {	
+				PublicKey pub = null;
+				try {
+					X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(getData.get(2)));
+					KeyFactory factory = KeyFactory.getInstance("RSA");
+					pub = factory.generatePublic(spec);
+				}catch(Exception e) {
+					System.out.println("Exception: " + e);
+				}
 				saveNewPeer(getData.get(0), connection.getInetAddress()			
-						.toString(), Integer.parseInt(getData.get(1)));			
+						.toString(), Integer.parseInt(getData.get(1)), pub);			
 				ServerGui.updateMessage(getData.get(0));	
 				ServerGui.updateNumberClient();
 			} else
@@ -84,11 +101,11 @@ public class ServerCore {
 	}
 	
 	
-	private void saveNewPeer(String user, String ip, int port) throws Exception {
+	private void saveNewPeer(String user, String ip, int port, PublicKey pubKey) throws Exception {
 		Peer newPeer = new Peer();		
 		if (dataPeer.size() == 0)				
 			dataPeer = new ArrayList<Peer>();
-		newPeer.setPeer(user, ip, port);		
+		newPeer.setPeer(user, ip, port, pubKey);		
 		dataPeer.add(newPeer);					
 	}
 	

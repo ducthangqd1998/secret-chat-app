@@ -53,7 +53,7 @@ public class ServerGui {
 	}
 	public static void updateMessage(String msg) {
 		txtMessage.append(msg + "\n");
-		System.out.println("Message" + msg);
+//		System.out.println("Message" + msg);
 	}
 
 	public static void updateNumberClient() {

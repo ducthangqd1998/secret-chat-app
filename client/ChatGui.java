@@ -1,6 +1,8 @@
 package client;
 
 import java.awt.EventQueue;
+
+import javax.crypto.Cipher;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.html.HTMLDocument;
@@ -11,6 +13,7 @@ import java.awt.Label;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.security.PublicKey;
 import java.util.*;
 import java.util.List;
 
@@ -26,10 +29,11 @@ public class ChatGui {
 
 	private static String URL_DIR = System.getProperty("user.dir");
 	private static String TEMP = "/temp/";
-
+	private Cryption myKey = null;
 	private ChatRoom chat;
 	private Socket socketChat;
 	private String username = "", nameGuest = "", nameFile = "";
+	private PublicKey Pubkey;
 	boolean isSendImage = false;
 	private JFrame frameChatGui;
 	private JTextField textName;
@@ -55,15 +59,17 @@ public class ChatGui {
 	File folder = null;
 
 
-	public ChatGui(String user, String guest, Socket socket, int port) {
+	public ChatGui(String user, String guest, Socket socket, int port, PublicKey key, Cryption mykey) {
 		username = user;
 		nameGuest = guest;
 		socketChat = socket;
+		Pubkey = key;
 		this.portServer = port;
+		myKey = mykey;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ChatGui window = new ChatGui(username, nameGuest, socketChat, portServer, 0);
+					ChatGui window = new ChatGui(username, nameGuest, socketChat, portServer, 0, Pubkey, mykey);
 					window.frameChatGui.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -131,14 +137,15 @@ public class ChatGui {
 		initialize();
 	}
 
-	public ChatGui(String user, String guest, Socket socket, int port, int a)
+	public ChatGui(String user, String guest, Socket socket, int port, int a, PublicKey key, Cryption myKey)
 			throws Exception {
 		username = user;
 		nameGuest = guest;
 		socketChat = socket;
+		this.Pubkey = key;
 		this.portServer = port;
 		initialize();
-		chat = new ChatRoom(socketChat, username, nameGuest);
+		chat = new ChatRoom(socketChat, username, nameGuest, Pubkey, myKey);
 		chat.start();
 	}
 
@@ -438,7 +445,8 @@ public class ChatGui {
 	}
 
 	public class ChatRoom extends Thread {
-
+		private PublicKey PublicKey;
+		private Cryption myKey = null;
 		private Socket connect;
 		// Self
 		private ObjectOutputStream outPeer;
@@ -452,11 +460,14 @@ public class ChatGui {
 		private InputStream inFileSend;
 		private DataFile dataFile;
 
-		public ChatRoom(Socket connection, String name, String guest)
+		public ChatRoom(Socket connection, String name, String guest, PublicKey key, Cryption mykey)
 				throws Exception {
 			connect = new Socket();
 			// user socket 
 			connect = connection;
+			PublicKey = key;
+			System.out.println("KeYYYYYYYYYYYYYYY" + mykey);
+			myKey = mykey;
 			nameGuest = guest;
 		}
 
@@ -474,6 +485,7 @@ public class ChatGui {
 						System.out.println("============" + msgObj + "============");
 						// User bên kia có ý định dừng chat
 						if (msgObj.equals(Tags.CHAT_CLOSE_TAG)) {
+							System.out.println(1);
 							isStop = true;
 							Tags.show(frameChatGui, nameGuest 
 									+ " closed chat with you! This windows will also be closed.", false);
@@ -490,6 +502,7 @@ public class ChatGui {
 							break;
 						}
 						if (Decode.checkFile(msgObj)) {
+							System.out.println(2);
 							isReceiveFile = true;
 							nameFileReceive = msgObj.substring(10,
 									msgObj.length() - 11);
@@ -511,7 +524,7 @@ public class ChatGui {
 							}
 						} else if (Decode.checkFeedBack(msgObj)) {
 							btnChoose.setEnabled(false);
-
+							System.out.println(3);
 							new Thread(new Runnable() {
 								public void run() {
 									try {
@@ -525,14 +538,17 @@ public class ChatGui {
 								}
 							}).start();
 						} else if (msgObj.equals(Tags.FILE_REQ_NOACK_TAG)) {
+							System.out.println(4);
 							Tags.show(frameChatGui, nameGuest
 									+ " don't want receive file", false);
 						} else if (msgObj.equals(Tags.FILE_DATA_BEGIN_TAG)) {
+							System.out.println(5);
 							finishReceive = false;
 							lblReceive.setVisible(true);
 							out = new FileOutputStream(URL_DIR + TEMP
 									+ nameFileReceive);
 						} else if (msgObj.equals(Tags.FILE_DATA_CLOSE_TAG)) {
+							System.out.println(6);
 							updateChat_receive("You receive file: " + nameFileReceive + " with size " + sizeReceive + " KB");
 							sizeReceive = 0;
 							out.flush();
@@ -554,8 +570,24 @@ public class ChatGui {
 //							lblReceive.setVisible(false);
 //							finishReceive = true;
 						} else {
-							String message = Decode.getMessage(msgObj);
-							updateChat_receive(message);
+							System.out.println(7);
+							byte message[] = null;
+							System.out.println("decryption");
+							System.out.println("okokoko1" + myKey);
+							System.out.println("okokoko" + myKey.getPrivateKey());
+							try {
+								System.out.println("okokoko" + myKey.getPrivateKey());
+								Cipher c = Cipher.getInstance("RSA");
+								c.init(Cipher.DECRYPT_MODE, myKey.getPrivateKey());
+								message = c.doFinal(Base64.getDecoder().decode(msgObj));
+								System.out.println("Dữ liệu sau khi giải mã: " + new String(message));
+							}catch(Exception e) {
+								System.out.println("Error for decode string: " + e);
+							}
+							System.out.println("okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk" + message);
+							System.out.println("raw text: " + msgObj);
+//							String message = Decode.getMessage(msgObj);
+							updateChat_receive( new String(message));
 						}
 					} else if (obj instanceof DataFile) {
 						DataFile data = (DataFile) obj;
@@ -583,6 +615,20 @@ public class ChatGui {
 				inFileSend = new FileInputStream(fileData);
 			}
 		}
+		
+		public String Encryption(String s, PublicKey pKey) {
+			String strEncrypt = null;
+			try {			
+				Cipher c = Cipher.getInstance("RSA");
+				c.init(Cipher.ENCRYPT_MODE, pKey);
+				byte encryptOut[] = c.doFinal(s.getBytes());
+				strEncrypt = Base64.getEncoder().encodeToString(encryptOut);
+				System.out.println("Chuỗi sau khi mã hoá: " + strEncrypt);
+			}catch(Exception e) {
+				System.out.println("Error for encode string: " + e);
+			}
+			return strEncrypt;
+		}
 
 		public void sendFile(String path) throws Exception {
 			getData(path);
@@ -609,7 +655,6 @@ public class ChatGui {
 					continueSendFile = false;
 //					updateChat_notify("If duoc thuc thi: " + String.valueOf(continueSendFile));
 					new Thread(new Runnable() {
-
 						@Override
 						public void run() {
 							try {
@@ -681,7 +726,6 @@ public class ChatGui {
 			}
 		}
 		
-		
 		//void send Message
 		// synchronized: Đồng bộ hóa dữ liệu, chia sẻ tài nguyên cho nhiều thread truy cập cùng 1 file
 		public synchronized void sendMessage(Object obj) throws Exception {
@@ -689,7 +733,9 @@ public class ChatGui {
 			// only send text
 			if (obj instanceof String) {
 				String message = obj.toString();
-				outPeer.writeObject(message);
+				System.out.println("message: " + message);
+				String encodeString = Encryption(message, PublicKey);
+				outPeer.writeObject(encodeString);
 				outPeer.flush();
 				if (isReceiveFile)
 					isReceiveFile = false;

@@ -1,10 +1,12 @@
 package client;
 
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
@@ -42,6 +44,7 @@ public class Cryption {
 	
 	public String Decryption(String s, PrivateKey priKey) {
 		String strDecry = null;
+		System.out.println("decryption");
 		try {
 			Cipher c = Cipher.getInstance("RSA");
 			c.init(Cipher.DECRYPT_MODE, priKey);
@@ -50,6 +53,7 @@ public class Cryption {
 		}catch(Exception e) {
 			System.out.println("Error for decode string: " + e);
 		}
+		System.out.println("decryption" + strDecry);
 		return strDecry;
 	}
 	
@@ -71,8 +75,27 @@ public class Cryption {
 		Cryption a = new Cryption();
 		System.out.println("=====================================");
 		Cryption b = new Cryption();
-		String msg = a.Encryption("Helloworld", b.getPublicKey());
-		b.Decryption(msg, b.getPrivateKey());
+//		String msg = a.Encryption("Helloworld", b.getPublicKey());
+//		b.Decryption(msg, b.getPrivateKey());
+//		System.out.println(b.publicKey);
+		String pub = Base64.getEncoder().encodeToString(b.publicKey.getEncoded());
+		System.out.println(b.publicKey.getEncoded().toString().getBytes());
+		byte[] z = Base64.getDecoder().decode(pub);
+		
+		try {
+			System.out.println(z);
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(z);
+			KeyFactory factory = KeyFactory.getInstance("RSA");
+			PublicKey pubKey = factory.generatePublic(spec);
+			
+			String msg = a.Encryption("Helloworld", pubKey);
+			b.Decryption(msg, b.getPrivateKey());
+		}catch(Exception e) {
+			System.out.println("Error: " + e);
+		}
+		
+		
+
 	}
 
 	

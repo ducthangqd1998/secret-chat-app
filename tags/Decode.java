@@ -1,6 +1,7 @@
 package tags;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,13 +12,16 @@ public class Decode {
 	private static Pattern createAccount = Pattern
 			.compile(Tags.SESSION_OPEN_TAG + Tags.PEER_NAME_OPEN_TAG + ".*"
 					+ Tags.PEER_NAME_CLOSE_TAG + Tags.PORT_OPEN_TAG + ".*"
-					+ Tags.PORT_CLOSE_TAG + Tags.SESSION_CLOSE_TAG);
+					+ Tags.PORT_CLOSE_TAG + Tags.PUBLIC_KEY_OPEN_TAG + ".*"
+					+ Tags.PUBLIC_KEY_CLOSE_TAG + Tags.SESSION_CLOSE_TAG);
+					
 
 	private static Pattern users = Pattern.compile(Tags.SESSION_ACCEPT_OPEN_TAG
 			+ "(" + Tags.PEER_OPEN_TAG + Tags.PEER_NAME_OPEN_TAG + ".+"
 			+ Tags.PEER_NAME_CLOSE_TAG + Tags.IP_OPEN_TAG + ".+"
 			+ Tags.IP_CLOSE_TAG + Tags.PORT_OPEN_TAG + "[0-9]+"
-			+ Tags.PORT_CLOSE_TAG + Tags.PEER_CLOSE_TAG + ")*"
+			+ Tags.PORT_CLOSE_TAG + Tags.PUBLIC_KEY_OPEN_TAG + ".+"
+			+ Tags.PUBLIC_KEY_CLOSE_TAG + Tags.PEER_CLOSE_TAG + ")*"
 			+ Tags.SESSION_ACCEPT_CLOSE_TAG);
 
 	private static Pattern request = Pattern
@@ -39,19 +43,32 @@ public class Decode {
 
 	public static ArrayList<String> getUser(String msg) {
 		ArrayList<String> user = new ArrayList<String>();
+//		System.out.println(msg);
 		if (createAccount.matcher(msg).matches()) {
 			Pattern findName = Pattern.compile(Tags.PEER_NAME_OPEN_TAG + ".*"
 					+ Tags.PEER_NAME_CLOSE_TAG);
 			Pattern findPort = Pattern.compile(Tags.PORT_OPEN_TAG + "[0-9]*"
 					+ Tags.PORT_CLOSE_TAG);
+			Pattern findPublicKey = Pattern.compile(Tags.PUBLIC_KEY_OPEN_TAG + ".*" 
+					+ Tags.PUBLIC_KEY_CLOSE_TAG);
 			Matcher find = findName.matcher(msg);
 			if (find.find()) {
 				String name = find.group(0);
+//				System.out.println(name.substring(11, name.length() - 12));
 				user.add(name.substring(11, name.length() - 12));
 				find = findPort.matcher(msg);
 				if (find.find()) {
 					String port = find.group(0);
+//					System.out.println(port.substring(6, port.length() - 7));
 					user.add(port.substring(6, port.length() - 7));
+					find = findPublicKey.matcher(msg);
+					if(find.find()) {
+						String publicKey = find.group(0);
+//						System.out.println(publicKey.substring(12, publicKey.length() - 13));
+						user.add(publicKey.substring(12, publicKey.length() - 13));
+					}
+					else
+						return null;
 				} else
 					return null;
 			} else
@@ -67,6 +84,7 @@ public class Decode {
 				+ Tags.PEER_NAME_OPEN_TAG + "[^<>]*" + Tags.PEER_NAME_CLOSE_TAG
 				+ Tags.IP_OPEN_TAG + "[^<>]*" + Tags.IP_CLOSE_TAG
 				+ Tags.PORT_OPEN_TAG + "[0-9]*" + Tags.PORT_CLOSE_TAG
+				+ Tags.PUBLIC_KEY_OPEN_TAG + "[^<>]*" + Tags.PUBLIC_KEY_CLOSE_TAG 
 				+ Tags.PEER_CLOSE_TAG);
 		Pattern findName = Pattern.compile(Tags.PEER_NAME_OPEN_TAG + ".*"
 				+ Tags.PEER_NAME_CLOSE_TAG);
@@ -74,6 +92,8 @@ public class Decode {
 				+ Tags.PORT_CLOSE_TAG);
 		Pattern findIP = Pattern.compile(Tags.IP_OPEN_TAG + ".+"
 				+ Tags.IP_CLOSE_TAG);
+		Pattern findPublicKey = Pattern.compile(Tags.PUBLIC_KEY_OPEN_TAG + ".*"
+				+ Tags.PUBLIC_KEY_CLOSE_TAG);
 		if (users.matcher(msg).matches()) {
 			Matcher find = findPeer.matcher(msg);
 			while (find.find()) {
@@ -96,6 +116,10 @@ public class Decode {
 					data = findInfo.group(0);
 					dataPeer.setPort(Integer.parseInt(data.substring(6,
 							data.length() - 7)));
+				}
+				findInfo = findPublicKey.matcher(peer);
+				if (findInfo.find()) {
+					
 				}
 				user.add(dataPeer);
 			}
@@ -142,20 +166,36 @@ public class Decode {
 		return null;
 	}
 
-	public static String getNameRequestChat(String msg) {
+	public static List<String> getNameRequestChat(String msg) {
 		Pattern checkRequest = Pattern.compile(Tags.CHAT_REQ_OPEN_TAG
 				+ Tags.PEER_NAME_OPEN_TAG + "[^<>]*" + Tags.PEER_NAME_CLOSE_TAG
+				+ Tags.PUBLIC_KEY_OPEN_TAG + "[^<>]*" + Tags.PUBLIC_KEY_CLOSE_TAG
 				+ Tags.CHAT_REQ_CLOSE_TAG);
+		
+		
+		Pattern findName = Pattern.compile(Tags.PEER_NAME_OPEN_TAG + ".*"
+				+ Tags.PEER_NAME_CLOSE_TAG);
+		
+		Pattern findPublicKey = Pattern.compile(Tags.PUBLIC_KEY_OPEN_TAG + ".*" 
+				+ Tags.PUBLIC_KEY_CLOSE_TAG);
+		
+		List<String> a = new ArrayList<String>();
+		
 		if (checkRequest.matcher(msg).matches()) {
-			int lenght = msg.length();
-			String name = msg
-					.substring(
-							(Tags.CHAT_REQ_OPEN_TAG + Tags.PEER_NAME_OPEN_TAG)
-									.length(),
-							lenght
-									- (Tags.PEER_NAME_CLOSE_TAG + Tags.CHAT_REQ_CLOSE_TAG)
-											.length());
-			return name;
+			Matcher find = findName.matcher(msg);
+			while (find.find()) {
+				String peer = find.group(0);
+				a.add(peer.substring(11, peer.length()- 12));
+				System.out.println("name: " + peer.substring(11, peer.length()- 12));
+				find = findPublicKey.matcher(msg);
+				if(find.find()) {
+					String publicKey = find.group(0);
+					System.out.println("key: " + publicKey.substring(12, publicKey.length() - 13));
+					a.add(publicKey.substring(12, publicKey.length() - 13));
+				}
+			}				
+		
+			return a;
 		}
 		return null;
 	}

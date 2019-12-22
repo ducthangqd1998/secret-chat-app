@@ -2,6 +2,7 @@ package login;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.util.Base64;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -9,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+
+import client.Cryption;
 import client.MainGui;
 import tags.Encode;
 import tags.Tags;
@@ -112,14 +115,16 @@ public class Login {
       InetAddress ipServer = InetAddress.getByName(IP);
       int portServer = Integer.parseInt("8080");
       Socket socketClient = new Socket(ipServer, portServer);
-
-      String msg = Encode.getCreateAccount(name, Integer.toString(portPeer));
+      /* Tạo key cho mỗi User */
+      Cryption key = new Cryption();
+      String publicKey = Base64.getEncoder().encodeToString(key.getPublicKey().getEncoded());
+      String msg = Encode.getCreateAccount(name, Integer.toString(portPeer), publicKey);
       ObjectOutputStream serverOutputStream = new ObjectOutputStream(socketClient.getOutputStream());
       serverOutputStream.writeObject(msg);
       serverOutputStream.flush();
       ObjectInputStream serverInputStream = new ObjectInputStream(socketClient.getInputStream());
       msg = (String) serverInputStream.readObject();
-
+      System.out.println("msg: " + msg);
       socketClient.close();
       if (msg.equals(Tags.SESSION_DENY_TAG)) {
        lblError.setForeground(new Color(220,20,60));
@@ -127,7 +132,7 @@ public class Login {
        lblError.setVisible(true);
        return;
       }
-      new MainGui(IP, portPeer, name, msg);
+      new MainGui(IP, portPeer, name, msg, key);
       //						new menuGUI(IP, portPeer, "toan", msg);
       frameLoginForm.dispose();
      } catch (Exception e) {
@@ -149,7 +154,5 @@ public class Login {
   btnLogin.setBounds(270, 255, 127, 40);
   frameLoginForm.getContentPane().add(btnLogin);
   lblError.setVisible(false);
-
-
  }
 }

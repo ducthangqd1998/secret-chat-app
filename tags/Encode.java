@@ -3,14 +3,17 @@ package tags;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.text.html.HTML.Tag;
+
 public class Encode {
 
 	private static Pattern checkMessage = Pattern.compile("[^<>]*[<>]");
 
-	public static String getCreateAccount(String name, String port) {
+	public static String getCreateAccount(String name, String port, String publicKey) {
 		return Tags.SESSION_OPEN_TAG + Tags.PEER_NAME_OPEN_TAG + name
 				+ Tags.PEER_NAME_CLOSE_TAG + Tags.PORT_OPEN_TAG + port
-				+ Tags.PORT_CLOSE_TAG + Tags.SESSION_CLOSE_TAG;
+				+ Tags.PORT_CLOSE_TAG + Tags.PUBLIC_KEY_OPEN_TAG + publicKey 
+				+ Tags.PUBLIC_KEY_CLOSE_TAG + Tags.SESSION_CLOSE_TAG;
 	}
 
 	public static String sendRequest(String name) {
@@ -39,19 +42,16 @@ public class Encode {
 		return Tags.CHAT_MSG_OPEN_TAG + result + Tags.CHAT_MSG_CLOSE_TAG;
 	}
 
-	public static String sendRequestChat(String name) {
+	public static String sendRequestChat(String name, String key) {
 		return Tags.CHAT_REQ_OPEN_TAG + Tags.PEER_NAME_OPEN_TAG + name
-				+ Tags.PEER_NAME_CLOSE_TAG + Tags.CHAT_REQ_CLOSE_TAG;
+				+ Tags.PEER_NAME_CLOSE_TAG + Tags.PUBLIC_KEY_OPEN_TAG + key
+				+ Tags.PUBLIC_KEY_CLOSE_TAG + Tags.CHAT_REQ_CLOSE_TAG;
 	}
 
 	public static String sendFile(String name) {
 		return Tags.FILE_REQ_OPEN_TAG + name + Tags.FILE_REQ_CLOSE_TAG;
 	}
 	
-	public static String sendImage(String name) {
-		return Tags.IMG_REQ_OPEN_TAG + name + Tags.IMG_REQ_CLOSE_TAG;
-	}
-
 	public static String exit(String name) {
 		return Tags.SESSION_KEEP_ALIVE_OPEN_TAG + Tags.PEER_NAME_OPEN_TAG
 				+ name + Tags.PEER_NAME_CLOSE_TAG + Tags.STATUS_OPEN_TAG

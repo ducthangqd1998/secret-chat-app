@@ -19,10 +19,12 @@ import java.awt.Color;
 import javax.swing.JList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.PublicKey;
 
 public class MainGui {
 
 	private Client clientNode;
+	private Cryption key;
 	private static String IPClient = "", username = "", dataUser = "";
 	private static int portClient = 0;
 	private JFrame frameMainGui;
@@ -34,29 +36,31 @@ public class MainGui {
 	static DefaultListModel<String> model = new DefaultListModel<>();
 	private JLabel lblUsername;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainGui window = new MainGui();
-					window.frameMainGui.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					MainGui window = new MainGui(key);
+//					window.frameMainGui.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
-	public MainGui(String arg, int arg1, String name, String msg) throws Exception {
+	public MainGui(String arg, int arg1, String name, String msg, Cryption pubkey) throws Exception {
 		IPClient = arg; // IP server 
 		portClient = arg1; // port client 
-		System.out.println("Port client" + portClient);
+		System.out.println("Port client: " + pubkey);
 		username = name;
 		dataUser = msg;
+		key = pubkey;
+		System.out.println("Key: +++" + pubkey);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainGui window = new MainGui();
+					MainGui window = new MainGui(key);
 					window.frameMainGui.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -65,10 +69,11 @@ public class MainGui {
 		});
 	}
 
-	public MainGui() throws Exception {
+	public MainGui(Cryption key) throws Exception {
 		initialize();
 		// Tạo một client 
-		clientNode = new Client(IPClient, portClient, username, dataUser);
+		System.out.println("Key: " + key);
+		clientNode = new Client(IPClient, portClient, username, dataUser, key);
 	}
 
 	public static void updateFriendMainGui(String msg) {

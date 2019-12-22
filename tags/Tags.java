@@ -27,7 +27,7 @@ public class Tags {
 	public static String IP_OPEN_TAG = "<IP>";// 16
 	public static String IP_CLOSE_TAG = "</IP>";// 17
 	public static String CHAT_DENY_TAG = "<CHAT_DENY />";// 18
-	public static String CHAT_ACCEPT_TAG = "<CHAT_ACCEPT />";// 19
+	public static String CHAT_ACCEPT_TAG = "<CHAT_ACCEPT/>";// 19
 	public static String CHAT_MSG_OPEN_TAG = "<CHAT_MSG>";// 20
 	public static String CHAT_MSG_CLOSE_TAG = "</CHAT_MSG>";// 21
 	public static String PEER_OPEN_TAG = "<PEER>";// 22
@@ -42,8 +42,8 @@ public class Tags {
 	public static String FILE_DATA_CLOSE_TAG = "</FILE_DATA>";// 31
 	public static String FILE_DATA_END_TAG = "<FILE_DATA_END />";// 32
 	public static String CHAT_CLOSE_TAG = "<CHAT_CLOSE />";// 33
-	public static String IMG_REQ_OPEN_TAG = "<IMG_REQ>";
-	public static String IMG_REQ_CLOSE_TAG = "</IMG_REQ>";
+	public static String PUBLIC_KEY_OPEN_TAG = "<PUBLIC_KEY>";
+	public static String PUBLIC_KEY_CLOSE_TAG = "</PUBLIC_KEY>";
 	// ------------------
 	public static String SERVER_ONLINE = "RUNNING";
 	public static String SERVER_OFFLINE = "STOP";
