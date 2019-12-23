@@ -7,7 +7,7 @@ public class Tags {
 
 	public static int IN_VALID = -1;
 
-	public static int MAX_MSG_SIZE = 1024000; // ~1MB
+	public static int MAX_MSG_SIZE = 2048000; // ~1MB
 
 	public static String SESSION_OPEN_TAG = "<SESSION_REQ>";// 1
 	public static String SESSION_CLOSE_TAG = "</SESSION_REQ>";// 2
@@ -44,6 +44,8 @@ public class Tags {
 	public static String CHAT_CLOSE_TAG = "<CHAT_CLOSE />";// 33
 	public static String PUBLIC_KEY_OPEN_TAG = "<PUBLIC_KEY>";
 	public static String PUBLIC_KEY_CLOSE_TAG = "</PUBLIC_KEY>";
+	public static String ICON_OPEN_TAG = "<ICON>";
+	public static String ICON_CLOSE_TAG = "</ICON>";
 	// ------------------
 	public static String SERVER_ONLINE = "RUNNING";
 	public static String SERVER_OFFLINE = "STOP";

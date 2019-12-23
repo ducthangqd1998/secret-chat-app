@@ -36,6 +36,9 @@ public class Decode {
 
 	private static Pattern checkNameFile = Pattern
 			.compile(Tags.FILE_REQ_OPEN_TAG + ".*" + Tags.FILE_REQ_CLOSE_TAG);
+	
+	private static Pattern checkIcon = Pattern
+			.compile(Tags.ICON_OPEN_TAG + ".*" + Tags.ICON_CLOSE_TAG);
 
 	private static Pattern feedBack = Pattern
 			.compile(Tags.FILE_REQ_ACK_OPEN_TAG + ".*"
@@ -165,7 +168,18 @@ public class Decode {
 		}
 		return null;
 	}
-
+	
+	public static String getPathIcon(String path) {
+		if (checkIcon.matcher(path).matches()) {
+			int begin = Tags.ICON_OPEN_TAG.length();
+			int end = path.length() - Tags.ICON_CLOSE_TAG.length();
+			System.out.println(begin + " "+ end);
+			String pathIcon = path.substring(begin, end);
+			return pathIcon;
+		}
+		return null;
+	}
+	
 	public static List<String> getNameRequestChat(String msg) {
 		Pattern checkRequest = Pattern.compile(Tags.CHAT_REQ_OPEN_TAG
 				+ Tags.PEER_NAME_OPEN_TAG + "[^<>]*" + Tags.PEER_NAME_CLOSE_TAG
@@ -202,6 +216,13 @@ public class Decode {
 
 	public static boolean checkFile(String name) {
 		if (checkNameFile.matcher(name).matches())
+			return true;
+		return false;
+	}
+	
+	public static boolean checkIcon(String msg) {
+		System.out.println("check: " + checkIcon.matcher(msg).matches());
+		if(checkIcon.matcher(msg).matches())
 			return true;
 		return false;
 	}

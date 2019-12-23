@@ -58,5 +58,9 @@ public class Encode {
 				+ Tags.SERVER_OFFLINE + Tags.STATUS_CLOSE_TAG
 				+ Tags.SESSION_KEEP_ALIVE_CLOSE_TAG;
 	}
+	
+	public static String sendIcon(String path) {
+		return Tags.ICON_OPEN_TAG + path + Tags.ICON_CLOSE_TAG;
+	}
 }
 

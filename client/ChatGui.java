@@ -100,7 +100,9 @@ public class ChatGui {
 	}
 
 	public void updateChat_receive(String msg) {
-		appendToPane(txtDisplayChat, "<div class='left' style='width: 40%; background-color: #f1f0f0;'>"+ msg +"</div>");
+		appendToPane(txtDisplayChat, "<div class='left' style='width: 40%; background-color: #f1f0f0; "
+				 + "margin: 2px; border-radius: 10px; height: 30px; display: flex;"
+				 + "align-items: center;'>"+ msg +"</div>");
 	}
 	
 	
@@ -127,10 +129,15 @@ public class ChatGui {
 	public void updateChat_send_Symbol(String msg) {
 		appendToPane(txtDisplayChat, "<table style='width: 100%;'>"
 				+ "<tr align='right'>"
-				+ "<td style='width: 59%;'></td>"
-				+ "<td style='width: 40%;'>" + msg 
+				+ "<td style='width: 100%;'></td>"
+				+ "<td style='width: 100%;'>" + msg 
 				+"</td> </tr>"
 				+ "</table>");
+	}
+	
+	public void updateChat_receive_Symbol(String msg) {
+		appendToPane(txtDisplayChat, "<div class='left' style='width: 40%;"
+				 + "margin: 2px; border-radius: 10px; height: 30px; display: flex;'>" + msg +"</div>");
 	}
 	
 	public ChatGui() {
@@ -328,15 +335,16 @@ public class ChatGui {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								System.out.println(ChatGui.class.getResource("/image/like.png"));
-								String msg = "<img src='" + "file:" + s + file.getName() + "'></img>";
+//								String msg = "<img src='" + "file:" + s + file.getName() + "'></img>";
+								String msg = "/image/icon/" + file.getName();
 								System.out.println(msg);
 								try {
-									chat.sendMessage(Encode.sendMessage(msg));
+									updateChat_send_Symbol(new String("<img src='" + "file:" + s + file.getName() + "'></img>"));
+									chat.sendMessage(Encode.sendIcon(msg));
 								} catch (Exception e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
-								updateChat_send_Symbol(msg);
 							}
 						});
 				        Emotions.add(button);
@@ -577,7 +585,8 @@ public class ChatGui {
 									}
 								}
 							}).start();
-						} else if (msgObj.equals(Tags.FILE_REQ_NOACK_TAG)) {
+						} 
+						else if (msgObj.equals(Tags.FILE_REQ_NOACK_TAG)) {
 							System.out.println(4);
 							Tags.show(frameChatGui, nameGuest
 									+ " don't want receive file", false);
@@ -588,7 +597,7 @@ public class ChatGui {
 							out = new FileOutputStream(URL_DIR + TEMP
 									+ nameFileReceive);
 						} else if (msgObj.equals(Tags.FILE_DATA_CLOSE_TAG)) {
-							System.out.println(6);
+							System.out.println("TT6");
 							updateChat_receive("You receive file: " + nameFileReceive + " with size " + sizeReceive + " KB");
 							sizeReceive = 0;
 							out.flush();
@@ -609,7 +618,15 @@ public class ChatGui {
 //							out.close();
 //							lblReceive.setVisible(false);
 //							finishReceive = true;
-						} else {
+						}
+						else if(Decode.checkIcon(msgObj)) {
+							String path = Decode.getPathIcon(msgObj);
+							s = ChatGui.class.getResource(path).toString().split(":", 2)[1];
+//							folder = new File(s);
+							String msg = "<img src='" + "file:" + s + "'></img>";
+							updateChat_receive_Symbol(new String(msg));
+						}
+						else {
 							System.out.println(7);
 							updateChat_receive( new String(msgObj));
 						}
@@ -674,16 +691,15 @@ public class ChatGui {
 			
 			textState.setText("Sending ...");
 			do {
-//				System.out.println("sizeOfSend : " + sizeOfSend);
+				System.out.println("sizeOfSend : " + sizeOfSend);
 				if (continueSendFile) {
-					System.out.println("continueSendFile" + continueSendFile);
 					continueSendFile = false;
-//					updateChat_notify("Neu duoc thuc thi: " + String.valueOf(continueSendFile));
+//					updateChat_notify("If duoc thuc thi: " + String.valueOf(continueSendFile));
 					new Thread(new Runnable() {
+
 						@Override
 						public void run() {
 							try {
-								System.out.println("Send file .......................");
 								inFileSend.read(dataFile.data);
 								sendMessage(dataFile);
 								sizeOfSend++;

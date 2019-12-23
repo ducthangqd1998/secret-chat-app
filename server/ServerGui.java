@@ -74,7 +74,7 @@ public class ServerGui {
 		frmServerMangement.getContentPane().setForeground(UIManager.getColor("RadioButtonMenuItem.acceleratorSelectionForeground"));
 		frmServerMangement.setTitle("Server Mangement");
 		frmServerMangement.setResizable(false);
-		frmServerMangement.setBounds(200, 200, 730, 686);
+		frmServerMangement.setBounds(500, 200, 730, 686);
 		frmServerMangement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmServerMangement.getContentPane().setLayout(null);
 		frmServerMangement.setBackground(Color.ORANGE);
@@ -114,14 +114,15 @@ public class ServerGui {
 		txtPort.setText("8080");
 
 		// UI của button start
-		JButton btnStart = new JButton("START");
+		JButton btnStart = new JButton("");
 		btnStart.setBackground(UIManager.getColor("RadioButtonMenuItem.selectionBackground"));
 		btnStart.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		
 		btnStart.setBounds(416, 155, 143, 43);			/////// Vi tri button START
 		frmServerMangement.getContentPane().add(btnStart);
 		btnStart.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/start.png")));
-		
+		btnStart.setFocusPainted(false);
+		btnStart.setContentAreaFilled(false);
 //		BufferedImage img = null;
 //		try {
 //		    img = ImageIO.read(new File(ServerGui.class.getResource("/image/serverManager.png").getFile()));
@@ -134,10 +135,11 @@ public class ServerGui {
 
 		
 		// Label Server Management 		
-		JLabel lblNhom = new JLabel("Server Management");
-		lblNhom.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-		lblNhom.setBounds(169, 13, 268, 76);
-		lblNhom.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/servermanager64x64.png")));
+		JLabel lblNhom = new JLabel("SERVER MANAGEMENT");
+		lblNhom.setFont(new Font("Segoe UI", Font.PLAIN, 25));
+		lblNhom.setForeground(Color.RED);
+		lblNhom.setBounds(250, 13, 268, 76);
+//		lblNhom.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/servermanager64x64.png")));
 		frmServerMangement.getContentPane().add(lblNhom);
 
 		// Màn hình cmd hiển thị thông tin
@@ -150,7 +152,7 @@ public class ServerGui {
 		frmServerMangement.getContentPane().add(txtMessage);
 
 		// Button Stop
-		JButton btnStop = new JButton("STOP");
+		JButton btnStop = new JButton("");
 		btnStop.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnStop.addActionListener(new ActionListener() {
 
@@ -172,6 +174,8 @@ public class ServerGui {
 		btnStop.setBounds(571, 155, 143, 43);						//// Vi tri button Stop
 		frmServerMangement.getContentPane().add(btnStop);
 		btnStop.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/stop.png")));
+		btnStop.setFocusPainted(false);
+		btnStop.setContentAreaFilled(false);
 		
 		// Trạng thái của server (ON/OFF)
 		JLabel lblnew111 = new JLabel("STATUS");
