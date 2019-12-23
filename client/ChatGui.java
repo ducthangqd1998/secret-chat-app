@@ -46,17 +46,18 @@ public class ChatGui {
 	private JProgressBar progressSendFile;
 	private JTextField txtPath;
 	private int portServer = 0;
-	private JDialog dialogIcon;
+	private JDialog dialogIcon, dialogSticker;
 	private JTextField txtMessage;
 	private JScrollPane scrollPane;
-	String pathIcon;
-	List<JButton> Emotions = new ArrayList<JButton>();
-	JButton button;
-	List<String> iconPath = new ArrayList<String>();
-	String s = "";
-	JScrollPane scrollPanel;
-	JPanel panel;
-	File folder = null;
+	private String pathIcon;
+	private List<JButton> Emotions = new ArrayList<JButton>();
+	private List<JButton> Stickers = new ArrayList<JButton>();
+	private JButton button;
+	private List<String> iconPath = new ArrayList<String>();
+	private String s = "";
+	private JScrollPane scrollPanel;
+	private JPanel panel;
+	private File folder = null;
 
 
 	public ChatGui(String user, String guest, Socket socket, int port, PublicKey key, Cryption mykey) {
@@ -293,7 +294,7 @@ public class ChatGui {
 			public void actionPerformed(ActionEvent e) {
 				String msg = "<img src='" + ChatGui.class.getResource("/image/like.png") +"'></img>";
 				try {
-					chat.sendMessage(Encode.sendMessage(msg));
+					chat.sendMessage(Encode.sendIcon(msg));
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -364,26 +365,75 @@ public class ChatGui {
 				dialogIcon.add(scrollPanel);
 				dialogIcon.setSize(250, 250);
 				dialogIcon.setVisible(true);
-//				new Icon("Icon");
-//				System.out.println(getPathIcon());
-//				String msg = "<img src='" + ChatGui.class.getResource("/image/smile.png") +"'></img>";
-//				System.out.println("Tin nhan truoc khi bi encode: " +  msg);
-//				System.out.println("Tin nhan sau khi bi encode: " +  Encode.sendMessage(msg));
-//				try {
-//					chat.sendMessage(Encode.sendMessage(msg));
-//				} catch (Exception e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
-//				updateChat_send_Symbol(msg);
 			}
 		});
 		btnIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
 		btnIcon.setContentAreaFilled(false);
 		btnIcon.setBounds(62, 96, 50, 36);
 		btnIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/smile.png")));
-		panelMessage.add(btnIcon);
 		
+		JButton btnSticker = new JButton();
+		btnSticker.setBorder(new EmptyBorder(0, 0, 0, 0));
+		btnSticker.setContentAreaFilled(false);
+		btnSticker.setBounds(150, 96, 50, 36);
+		btnSticker.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/qoobee.png")));
+		btnSticker.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dialogSticker = new JDialog(frameChatGui, "Icon");
+				Stickers = null;
+				try {
+					s = Icon.class.getResource("/image/stickers/").toString().split(":", 2)[1];
+					folder = new File(s);
+				}catch(Exception e) {}
+				System.out.println(s);
+				File[] listOfFiles = folder.listFiles();
+				int i = 0; 
+				for (File file : listOfFiles) {
+				    if (file.isFile()) {
+				        button = new JButton();
+				        button.setBorder(new EmptyBorder(0, 0, 0, 0));
+				        button.setContentAreaFilled(false);
+				        button.setIcon(new ImageIcon(s + file.getName()));
+				        button.setBackground(Color.WHITE);
+				        iconPath.add(s + file.getName());
+				        button.addActionListener( new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								String msg = "/image/stickers/" + file.getName();
+								System.out.println(msg);
+								try {
+									updateChat_send_Symbol(new String("<img src='" + "file:" + s + file.getName() + "'></img>"));
+									chat.sendMessage(Encode.sendIcon(msg));
+								} catch (Exception e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							}
+						});
+				        Stickers.add(button);
+				        i++;
+				    }
+				}
+				
+				panel = new JPanel(new GridLayout(17, 3, 0, 10));
+				
+				for (i = 0; i < Stickers.size(); i++) {
+				    panel.add(Stickers.get(i));
+				}
+				panel.setBackground(Color.WHITE);
+				scrollPanel = new JScrollPane();
+				scrollPanel.setViewportView(panel);
+				scrollPanel.setForeground(Color.WHITE);
+				dialogSticker.add(scrollPanel);
+				dialogSticker.setSize(400, 400);
+				dialogSticker.setVisible(true);
+			}
+		});
+		
+		panelMessage.add(btnIcon);
+		panelMessage.add(btnSticker);
 		txtMessage.addKeyListener(new KeyListener() {
 
 			@Override

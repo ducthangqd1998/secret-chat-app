@@ -168,7 +168,7 @@ public class MainGui {
 		lblActiveNow = new JLabel("Users Online");
 		lblActiveNow.setForeground(new Color(100, 149, 237));
 		lblActiveNow.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblActiveNow.setBounds(10, 70, 156, 16);
+		lblActiveNow.setBounds(10, 70, 80, 16);
 		frameMainGui.getContentPane().add(lblActiveNow);
 		
 		listActive = new JList<>(model);
@@ -186,7 +186,7 @@ public class MainGui {
 		lblUsername = new JLabel(username);
 		lblUsername.setForeground(Color.RED);
 		lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		lblUsername.setBounds(75, 76, 156, 28);
+		lblUsername.setBounds(95, 70, 80, 28);
 		frameMainGui.getContentPane().add(lblUsername);
 
 	}
