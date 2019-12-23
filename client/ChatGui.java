@@ -382,7 +382,7 @@ public class ChatGui {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				dialogSticker = new JDialog(frameChatGui, "Icon");
-				Stickers = null;
+//				Stickers = null;
 				try {
 					s = Icon.class.getResource("/image/stickers/").toString().split(":", 2)[1];
 					folder = new File(s);
@@ -746,7 +746,6 @@ public class ChatGui {
 					continueSendFile = false;
 //					updateChat_notify("If duoc thuc thi: " + String.valueOf(continueSendFile));
 					new Thread(new Runnable() {
-
 						@Override
 						public void run() {
 							try {

@@ -7,7 +7,7 @@ public class Tags {
 
 	public static int IN_VALID = -1;
 
-	public static int MAX_MSG_SIZE = 2048000; // ~1MB
+	public static int MAX_MSG_SIZE = 1024000; // ~1MB
 
 	public static String SESSION_OPEN_TAG = "<SESSION_REQ>";// 1
 	public static String SESSION_CLOSE_TAG = "</SESSION_REQ>";// 2
